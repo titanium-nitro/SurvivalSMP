@@ -5,13 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Survival SMP Q&A</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
     body {
       background: url('bg.png') repeat;
       background-size: cover;
@@ -22,74 +16,17 @@
       align-items: center;
       text-align: center;
     }
-
-    header {
-      background: rgba(0, 0, 0, 0.6);
-      width: 100%;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-    }
-
-    header img {
-      height: 80px;
-    }
-
-    main {
-      max-width: 800px;
-      width: 90%;
-      background: rgba(0,0,0,0.6);
-      padding: 20px;
-      margin: 20px auto;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    }
-
-    h1, h2 {
-      color: #ffcc00;
-      margin-bottom: 10px;
-    }
-
-    section {
-      margin-top: 20px;
-      text-align: left;
-    }
-
-    .updates ul {
-      list-style-type: square;
-      padding-left: 20px;
-    }
-
-    .question-box, .reply-box {
-      background: rgba(255,255,255,0.1);
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 10px;
-    }
-
-    input, textarea, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 6px;
-      font-size: 1em;
-    }
-
-    button {
-      background: #ffcc00;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #ffdd33;
-    }
-
-    footer {
-      margin: 20px 0;
-      color: #ccc;
-    }
+    header { background: rgba(0,0,0,0.6); width: 100%; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);}
+    header img { height: 80px; }
+    main { max-width: 800px; width: 90%; background: rgba(0,0,0,0.6); padding: 20px; margin: 20px auto; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.4); }
+    h1, h2 { color: #ffcc00; margin-bottom: 10px; }
+    section { margin-top: 20px; text-align: left; }
+    .updates ul { list-style-type: square; padding-left: 20px; }
+    .question-box, .reply-box { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-top: 10px; }
+    input, textarea, button { width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 6px; font-size: 1em; }
+    button { background: #ffcc00; color: #000; font-weight: bold; cursor: pointer; }
+    button:hover { background: #ffdd33; }
+    footer { margin: 20px 0; color: #ccc; }
   </style>
 </head>
 <body>
@@ -100,7 +37,6 @@
   </header>
 
   <main>
-    <!-- Update Log -->
     <section class="updates">
       <h2>Update Log</h2>
       <ul id="updateList">
@@ -109,7 +45,6 @@
       </ul>
     </section>
 
-    <!-- Q&A Section -->
     <section class="questions">
       <h2>Ask a Question</h2>
       <form id="questionForm">
@@ -129,30 +64,27 @@
 
   <!-- Firebase Q&A system -->
   <script type="module">
-    // Import Firebase SDKs
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-    // 🔧 Your Firebase configuration
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY_HERE",
+      apiKey: "AIzaSyBlsUa0XGTu0qFpPE5a-wAzaPN8LnwJMzQ",
       authDomain: "survivalsmp-qanda.firebaseapp.com",
       databaseURL: "https://survivalsmp-qanda-default-rtdb.firebaseio.com",
       projectId: "survivalsmp-qanda",
-      storageBucket: "survivalsmp-qanda.appspot.com",
+      storageBucket: "survivalsmp-qanda.firebasestorage.app",
       messagingSenderId: "764350249893",
-      appId: "YOUR_APP_ID_HERE"
+      appId: "1:764350249893:web:8c8df20ea2fc3be19f464c"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const questionsRef = ref(db, 'questions');
 
     const form = document.getElementById('questionForm');
     const questionList = document.getElementById('questionList');
-    const questionsRef = ref(db, 'questions');
 
-    // Real-time load of all questions
+    // Load questions in real-time
     onValue(questionsRef, (snapshot) => {
       const data = snapshot.val() || {};
       questionList.innerHTML = '';
@@ -168,7 +100,7 @@
       });
     });
 
-    // Submit new question
+    // Submit a question
     form.addEventListener('submit', e => {
       e.preventDefault();
       const name = document.getElementById('username').value.trim();
@@ -178,7 +110,7 @@
       form.reset();
     });
 
-    // Reply to question
+    // Reply to a question
     window.replyQuestion = async (id) => {
       const reply = prompt('Enter your reply:');
       if (reply && reply.trim() !== '') {
