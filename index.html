@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Survival SMP Q&A</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: url('bg.png') repeat;
+      background-size: cover;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    header {
+      background: rgba(0, 0, 0, 0.6);
+      width: 100%;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    header img {
+      height: 80px;
+    }
+
+    main {
+      max-width: 800px;
+      width: 90%;
+      background: rgba(0,0,0,0.6);
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    h1, h2 {
+      color: #ffcc00;
+      margin-bottom: 10px;
+    }
+
+    section {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .updates ul {
+      list-style-type: square;
+      padding-left: 20px;
+    }
+
+    .question-box, .reply-box {
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+    }
+
+    button {
+      background: #ffcc00;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ffdd33;
+    }
+
+    footer {
+      margin: 20px 0;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Survival SMP Logo">
+    <h1>Welcome to Survival SMP</h1>
+    <p>Join the adventure, survive together!</p>
+  </header>
+
+  <main>
+    <!-- Update Log -->
+    <section class="updates">
+      <h2>Update Log</h2>
+      <ul id="updateList">
+        <li><strong>Nov 8, 2025:</strong> Connected Q&A to Firebase! 🌐</li>
+        <li><strong>Nov 7, 2025:</strong> Added new Nether hub and trading hall.</li>
+      </ul>
+    </section>
+
+    <!-- Q&A Section -->
+    <section class="questions">
+      <h2>Ask a Question</h2>
+      <form id="questionForm">
+        <input type="text" id="username" placeholder="Your name" required>
+        <textarea id="questionText" placeholder="Your question..." required></textarea>
+        <button type="submit">Submit Question</button>
+      </form>
+
+      <h2>Community Questions</h2>
+      <div id="questionList"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Survival SMP. Made with ❤️ by the community.</p>
+  </footer>
+
+  <!-- Firebase Q&A system -->
+  <script type="module">
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    // 🔧 Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY_HERE",
+      authDomain: "survivalsmp-qanda.firebaseapp.com",
+      databaseURL: "https://survivalsmp-qanda-default-rtdb.firebaseio.com",
+      projectId: "survivalsmp-qanda",
+      storageBucket: "survivalsmp-qanda.appspot.com",
+      messagingSenderId: "764350249893",
+      appId: "YOUR_APP_ID_HERE"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const form = document.getElementById('questionForm');
+    const questionList = document.getElementById('questionList');
+    const questionsRef = ref(db, 'questions');
+
+    // Real-time load of all questions
+    onValue(questionsRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      questionList.innerHTML = '';
+      Object.entries(data).forEach(([id, q]) => {
+        const div = document.createElement('div');
+        div.className = 'question-box';
+        div.innerHTML = `
+          <p><strong>${q.name}:</strong> ${q.text}</p>
+          ${q.answer ? `<div class="reply-box"><strong>Admin Reply:</strong> ${q.answer}</div>` : ''}
+          <button onclick="replyQuestion('${id}')">Reply</button>
+        `;
+        questionList.appendChild(div);
+      });
+    });
+
+    // Submit new question
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('username').value.trim();
+      const text = document.getElementById('questionText').value.trim();
+      if (!name || !text) return;
+      push(questionsRef, { name, text });
+      form.reset();
+    });
+
+    // Reply to question
+    window.replyQuestion = async (id) => {
+      const reply = prompt('Enter your reply:');
+      if (reply && reply.trim() !== '') {
+        const qRef = ref(db, 'questions/' + id);
+        await update(qRef, { answer: reply.trim() });
+      }
+    };
+  </script>
+</body>
+</html>
